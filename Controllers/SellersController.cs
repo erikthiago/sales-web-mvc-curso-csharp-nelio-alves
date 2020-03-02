@@ -1,34 +1,43 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SalesWebMVC.Models;
+using SalesWebMVC.Models.ViewModels;
 using SalesWebMVC.Services;
 
 namespace SalesWebMVC.Controllers
 {
     public class SellersController : Controller
     {
-        private readonly SellerService _service;
+        private readonly SellerService _sellerService;
+        private readonly DepartamentService _departamentService;
 
-        public SellersController(SellerService service)
+        public SellersController(SellerService service, DepartamentService departamentService)
         {
-            _service = service;
+            _sellerService = service;
+            _departamentService = departamentService;
         }
 
         public IActionResult Index()
         {
-            var list = _service.FindAll();
+            var list = _sellerService.FindAll();
             return View(list);
         }
 
         public IActionResult Create()
         {
-            return View();
+            var departaments = _departamentService.FindAll();
+            var viewModel = new SellerFormViewModel
+            {
+                Departaments = departaments
+            };
+
+            return View(viewModel);
         }
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         public IActionResult Create(Seller seller)
         {
-            _service.Insert(seller);
+            _sellerService.Insert(seller);
             return RedirectToAction(nameof(Index));
         }
     }
